@@ -1,4 +1,4 @@
-# Athenaeum — Library Management System
+# ISRA - Library Management System
 
 A full-stack neighborhood library management system built with:
 
