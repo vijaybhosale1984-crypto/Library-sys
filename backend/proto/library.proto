@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package library;
+
+import "google/protobuf/timestamp.proto";
+
+// ─── Book messages ────────────────────────────────────────────────────────────
+
+message Book {
+  int32  id           = 1;
+  string title        = 2;
+  string author       = 3;
+  string isbn         = 4;
+  string genre        = 5;
+  int32  total_copies = 6;
+  int32  avail_copies = 7;
+  int32  published_year = 8;
+  string description  = 9;
+}
+
+message CreateBookRequest {
+  string title         = 1;
+  string author        = 2;
+  string isbn          = 3;
+  string genre         = 4;
+  int32  total_copies  = 5;
+  int32  published_year = 6;
+  string description   = 7;
+}
+
+message UpdateBookRequest {
+  int32  id            = 1;
+  string title         = 2;
+  string author        = 3;
+  string isbn          = 4;
+  string genre         = 5;
+  int32  total_copies  = 6;
+  int32  published_year = 7;
+  string description   = 8;
+}
+
+message GetBookRequest   { int32 id = 1; }
+message DeleteBookRequest { int32 id = 1; }
+message ListBooksRequest {
+  int32  page     = 1;
+  int32  per_page = 2;
+  string search   = 3;
+}
+message ListBooksResponse {
+  repeated Book books = 1;
+  int32 total         = 2;
+}
+
+// ─── Member messages ──────────────────────────────────────────────────────────
+
+message Member {
+  int32  id         = 1;
+  string name       = 2;
+  string email      = 3;
+  string phone      = 4;
+  string address    = 5;
+  google.protobuf.Timestamp member_since = 6;
+  bool   is_active  = 7;
+}
+
+message CreateMemberRequest {
+  string name    = 1;
+  string email   = 2;
+  string phone   = 3;
+  string address = 4;
+}
+
+message UpdateMemberRequest {
+  int32  id      = 1;
+  string name    = 2;
+  string email   = 3;
+  string phone   = 4;
+  string address = 5;
+  bool   is_active = 6;
+}
+
+message GetMemberRequest    { int32 id = 1; }
+message DeleteMemberRequest { int32 id = 1; }
+message ListMembersRequest {
+  int32  page     = 1;
+  int32  per_page = 2;
+  string search   = 3;
+}
+message ListMembersResponse {
+  repeated Member members = 1;
+  int32 total             = 2;
+}
+
+// ─── Loan messages ────────────────────────────────────────────────────────────
+
+message Loan {
+  int32  id          = 1;
+  int32  book_id     = 2;
+  int32  member_id   = 3;
+  string book_title  = 4;
+  string member_name = 5;
+  google.protobuf.Timestamp borrowed_at = 6;
+  google.protobuf.Timestamp due_date    = 7;
+  google.protobuf.Timestamp returned_at = 8;
+  bool   is_overdue  = 9;
+  double fine_amount = 10;
+  string status      = 11;  // active | returned | overdue
+}
+
+message BorrowBookRequest {
+  int32 book_id   = 1;
+  int32 member_id = 2;
+  int32 loan_days = 3;  // default 14
+}
+
+message ReturnBookRequest {
+  int32 loan_id = 1;
+}
+
+message GetLoanRequest { int32 id = 1; }
+
+message ListLoansRequest {
+  int32  member_id = 1;  // filter by member (0 = all)
+  int32  book_id   = 2;  // filter by book   (0 = all)
+  string status    = 3;  // active | returned | overdue | ""
+  int32  page      = 4;
+  int32  per_page  = 5;
+}
+
+message ListLoansResponse {
+  repeated Loan loans = 1;
+  int32 total         = 2;
+}
+
+message DeleteResponse { bool success = 1; string message = 2; }
+
+message DashboardStats {
+  int32  total_books    = 1;
+  int32  total_members  = 2;
+  int32  active_loans   = 3;
+  int32  overdue_loans  = 4;
+  double total_fines    = 5;
+}
+
+// ─── Service definitions ──────────────────────────────────────────────────────
+
+service LibraryService {
+  // Books
+  rpc CreateBook  (CreateBookRequest)  returns (Book);
+  rpc GetBook     (GetBookRequest)     returns (Book);
+  rpc UpdateBook  (UpdateBookRequest)  returns (Book);
+  rpc DeleteBook  (DeleteBookRequest)  returns (DeleteResponse);
+  rpc ListBooks   (ListBooksRequest)   returns (ListBooksResponse);
+
+  // Members
+  rpc CreateMember (CreateMemberRequest) returns (Member);
+  rpc GetMember    (GetMemberRequest)    returns (Member);
+  rpc UpdateMember (UpdateMemberRequest) returns (Member);
+  rpc DeleteMember (DeleteMemberRequest) returns (DeleteResponse);
+  rpc ListMembers  (ListMembersRequest)  returns (ListMembersResponse);
+
+  // Loans
+  rpc BorrowBook (BorrowBookRequest) returns (Loan);
+  rpc ReturnBook (ReturnBookRequest) returns (Loan);
+  rpc GetLoan    (GetLoanRequest)    returns (Loan);
+  rpc ListLoans  (ListLoansRequest)  returns (ListLoansResponse);
+
+  // Dashboard
+  rpc GetDashboardStats (DeleteResponse) returns (DashboardStats);
+}

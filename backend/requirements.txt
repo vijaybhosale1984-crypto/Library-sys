@@ -1,0 +1,8 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+psycopg2-binary==2.9.9
+pydantic[email]==2.7.1
+python-dotenv==1.0.1
+protobuf==5.26.1
+grpcio==1.63.0
+grpcio-tools==1.63.0
